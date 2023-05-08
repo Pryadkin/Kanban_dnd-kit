@@ -29,82 +29,20 @@ import {
     defaultDropAnimationSideEffects,
 } from '@dnd-kit/core'
 import {
-    AnimateLayoutChanges,
     SortableContext,
-    useSortable,
     arrayMove,
-    defaultAnimateLayoutChanges,
     verticalListSortingStrategy,
     SortingStrategy,
     horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import {CSS} from '@dnd-kit/utilities'
 
 import {createRange} from '../../utils/createRange'
+import {getColor} from '../../utils/getColor'
 import {coordinateGetter as multipleContainersCoordinateGetter} from '../../utils/multipulContainersKayboardCooldinates'
-import type {ContainerProps} from '../Container'
 import {Container} from '../Container'
+import {DroppableContainer} from '../DroppableContainer'
 import {Item} from '../Item'
-
-const animateLayoutChanges: AnimateLayoutChanges = args => defaultAnimateLayoutChanges({...args, wasDragging: true})
-
-const DroppableContainer = ({
-    children,
-    columns = 1,
-    disabled,
-    id,
-    items,
-    style,
-    ...props
-}: ContainerProps & {
-    disabled?: boolean;
-    id: UniqueIdentifier;
-    items: UniqueIdentifier[];
-    style?: React.CSSProperties;
-}) => {
-    const {
-        active,
-        attributes,
-        isDragging,
-        listeners,
-        over,
-        setNodeRef,
-        transition,
-        transform,
-    } = useSortable({
-        id,
-        data: {
-            type: 'container',
-            children: items,
-        },
-        animateLayoutChanges,
-    })
-    const isOverContainer = over
-        ? (id === over.id && active?.data.current?.type !== 'container')
-        || items.includes(over.id)
-        : false
-
-    return (
-        <Container
-            ref={disabled ? undefined : setNodeRef}
-            style={{
-                ...style,
-                transition,
-                transform: CSS.Translate.toString(transform),
-                opacity: isDragging ? 0.5 : undefined,
-            }}
-            hover={isOverContainer}
-            handleProps={{
-                ...attributes,
-                ...listeners,
-            }}
-            columns={columns}
-            {...props}
-        >
-            {children}
-        </Container>
-    )
-}
+import {SortableItem} from '../SortableItem'
 
 const dropAnimation: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
@@ -150,22 +88,6 @@ export const TRASH_ID = 'void'
 const PLACEHOLDER_ID = 'placeholder'
 const empty: UniqueIdentifier[] = []
 
-function getColor(id: UniqueIdentifier) {
-    switch (String(id)[0]) {
-        case 'A':
-            return '#7193f1'
-        case 'B':
-            return '#ffda6c'
-        case 'C':
-            return '#00bcd4'
-        case 'D':
-            return '#ef769f'
-        default: return '#7193f1'
-    }
-
-    return undefined
-}
-
 const Trash = ({id}: {id: UniqueIdentifier}) => {
     const {setNodeRef, isOver} = useDroppable({
         id,
@@ -191,85 +113,6 @@ const Trash = ({id}: {id: UniqueIdentifier}) => {
         >
             Drop here to delete
         </div>
-    )
-}
-
-interface SortableItemProps {
-    containerId: UniqueIdentifier;
-    id: UniqueIdentifier;
-    index: number;
-    handle: boolean;
-    disabled?: boolean;
-    style(args: any): React.CSSProperties;
-    getIndex(id: UniqueIdentifier): number;
-    renderItem(): React.ReactElement;
-    wrapperStyle({index}: {index: number}): React.CSSProperties;
-}
-
-const SortableItem = ({
-    disabled,
-    id,
-    index,
-    handle,
-    renderItem,
-    style,
-    containerId,
-    getIndex,
-    wrapperStyle,
-}: SortableItemProps) => {
-    const {
-        setNodeRef,
-        setActivatorNodeRef,
-        listeners,
-        isDragging,
-        isSorting,
-        over,
-        overIndex,
-        transform,
-        transition,
-    } = useSortable({
-        id,
-    })
-    function useMountStatus() {
-        const [isMounted, setIsMounted] = useState(false)
-
-        useEffect(() => {
-            const timeout = setTimeout(() => setIsMounted(true), 500)
-
-            return () => clearTimeout(timeout)
-        }, [])
-
-        return isMounted
-    }
-
-    const mounted = useMountStatus()
-    const mountedWhileDragging = isDragging && !mounted
-
-    return (
-        <Item
-            ref={disabled ? undefined : setNodeRef}
-            value={id}
-            dragging={isDragging}
-            sorting={isSorting}
-            handle={handle}
-            handleProps={handle ? {ref: setActivatorNodeRef} : undefined}
-            index={index}
-            wrapperStyle={wrapperStyle({index})}
-            style={style({
-                index,
-                value: id,
-                isDragging,
-                isSorting,
-                overIndex: over ? getIndex(over.id) : overIndex,
-                containerId,
-            })}
-            color={getColor(id)}
-            transition={transition}
-            transform={transform}
-            fadeIn={mountedWhileDragging}
-            listeners={listeners}
-            renderItem={renderItem}
-        />
     )
 }
 
@@ -319,7 +162,6 @@ export const Kanban = ({
     const collisionDetectionStrategy: CollisionDetection = useCallback(
         args => {
             if (activeId && activeId in items) {
-                console.log('activeId', activeId)
                 return closestCenter({
                     ...args,
                     droppableContainers: args.droppableContainers.filter(
