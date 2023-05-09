@@ -36,6 +36,7 @@ import {
     horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
 
+import {TColName} from '../../types'
 import {createRange} from '../../utils/createRange'
 import {getColor} from '../../utils/getColor'
 import {coordinateGetter as multipleContainersCoordinateGetter} from '../../utils/multipulContainersKayboardCooldinates'
@@ -57,6 +58,7 @@ const dropAnimation: DropAnimation = {
 type Items = Record<UniqueIdentifier, UniqueIdentifier[]>
 
 interface Props {
+    columnNames: TColName;
     adjustScale?: boolean;
     cancelDrop?: CancelDrop;
     columns?: number;
@@ -86,7 +88,6 @@ interface Props {
 
 export const TRASH_ID = 'void'
 const PLACEHOLDER_ID = 'placeholder'
-const empty: UniqueIdentifier[] = []
 
 const Trash = ({id}: {id: UniqueIdentifier}) => {
     const {setNodeRef, isOver} = useDroppable({
@@ -117,6 +118,7 @@ const Trash = ({id}: {id: UniqueIdentifier}) => {
 }
 
 export const Kanban = ({
+    columnNames,
     adjustScale = false,
     itemCount = 3,
     cancelDrop,
@@ -289,7 +291,7 @@ export const Kanban = ({
     function renderContainerDragOverlay(containerId: UniqueIdentifier) {
         return (
             <Container
-                label={`Column ${containerId}`}
+                label={columnNames[containerId]}
                 columns={columns}
                 style={{
                     height: '100%',
@@ -507,7 +509,7 @@ export const Kanban = ({
                         <DroppableContainer
                             key={containerId}
                             id={containerId}
-                            label={minimal ? undefined : `Column ${containerId}`}
+                            label={minimal ? undefined : columnNames[containerId]}
                             columns={columns}
                             items={items[containerId]}
                             scrollable={scrollable}
@@ -533,7 +535,7 @@ export const Kanban = ({
                             </SortableContext>
                         </DroppableContainer>
                     ))}
-                    {minimal
+                    {/* {minimal
                         ? undefined
                         : (
                             <DroppableContainer
@@ -545,7 +547,7 @@ export const Kanban = ({
                             >
                                 + Add column
                             </DroppableContainer>
-                        )}
+                        )} */}
                 </SortableContext>
             </div>
             {createPortal(
