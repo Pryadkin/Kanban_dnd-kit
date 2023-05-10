@@ -20,6 +20,7 @@ module.exports = {
         'promise'
     ],
     rules: {
+        "import/extensions": "off",
         "react/jsx-props-no-spreading": "off",
         'react/react-in-jsx-scope': 'off',
         'semi': ['error', 'never'],
@@ -144,6 +145,7 @@ module.exports = {
     },
     ignorePatterns: [
         '.eslintrc.cjs',
+        'vite.config.ts',
         '.babelrc.js',
         'dev-backend',
         'setupProxy.js',

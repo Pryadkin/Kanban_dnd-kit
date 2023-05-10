@@ -1,9 +1,8 @@
 import React, {forwardRef} from 'react'
 
+import {Handle} from '@components/Handle'
+import {Remove} from '@components/Remove'
 import classNames from 'classnames'
-
-import {Handle} from '../Handle'
-import {Remove} from '../Remove'
 
 import styles from './Container.module.scss'
 

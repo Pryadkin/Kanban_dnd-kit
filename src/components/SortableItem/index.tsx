@@ -1,11 +1,10 @@
 import {useEffect, useState} from 'react'
 
+import {Item} from '@components/Item'
 import {UniqueIdentifier} from '@dnd-kit/core'
 import {useSortable} from '@dnd-kit/sortable'
 
-import {ITask} from '../../types'
-import {getColor} from '../../utils/getColor'
-import {Item} from '../Item'
+import {getColor} from '@/utils'
 
 interface SortableItemProps {
     value: any,

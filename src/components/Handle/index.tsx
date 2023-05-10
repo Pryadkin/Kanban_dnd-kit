@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import React, {forwardRef} from 'react'
+import {forwardRef} from 'react'
 
 import {Button, ButtonProps} from '../Button'
 

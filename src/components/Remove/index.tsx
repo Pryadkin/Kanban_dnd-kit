@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {Button, ButtonProps} from '../Button'
+import {Button, ButtonProps} from '@components/Button'
 
 export const Remove = (props: ButtonProps) => (
     <Button

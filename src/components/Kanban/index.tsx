@@ -36,14 +36,13 @@ import {
     horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
 
-import {ITask, TColName} from '../../types'
-import {createRange} from '../../utils/createRange'
-import {getColor} from '../../utils/getColor'
-import {coordinateGetter as multipleContainersCoordinateGetter} from '../../utils/multipulContainersKayboardCooldinates'
 import {Container} from '../Container'
 import {DroppableContainer} from '../DroppableContainer'
 import {Item} from '../Item'
 import {SortableItem} from '../SortableItem'
+
+import {IKanbanItems, ITask, TColName} from '@/types'
+import {createRange, getColor, coordinateGetter as multipleContainersCoordinateGetter} from '@/utils'
 
 const dropAnimation: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
@@ -54,8 +53,6 @@ const dropAnimation: DropAnimation = {
         },
     }),
 }
-
-type Items = Record<UniqueIdentifier, UniqueIdentifier[]>
 
 interface Props {
     tasks: ITask[];
@@ -76,7 +73,7 @@ interface Props {
     }): React.CSSProperties;
     wrapperStyle?(args: {index: number}): React.CSSProperties;
     itemCount?: number;
-    items?: Items;
+    items?: IKanbanItems;
     handle?: boolean;
     renderItem?: any;
     strategy?: SortingStrategy;
@@ -85,7 +82,7 @@ interface Props {
     trashable?: boolean;
     scrollable?: boolean;
     vertical?: boolean;
-    onSetTasks: (val: Items) => void
+    onSetTasks: (val: IKanbanItems) => void
 }
 
 export const TRASH_ID = 'void'
@@ -163,7 +160,7 @@ export const Kanban = ({
         return objTask
     }
 
-    const [items, setItems] = useState<Items>(
+    const [items, setItems] = useState<IKanbanItems>(
         () => initialItems ?? {
             A: createRange(itemCount, index => `A${index + 1}`),
             B: createRange(itemCount, index => `B${index + 1}`),
@@ -171,9 +168,9 @@ export const Kanban = ({
             D: createRange(itemCount, index => `D${index + 1}`),
         },
     )
-    useEffect(() => {
-        onSetTasks(items)
-    }, [items, onSetTasks])
+    // useEffect(() => {
+    //     onSetTasks(items)
+    // }, [items, onSetTasks])
 
     const [containers, setContainers] = useState(
         Object.keys(items) as UniqueIdentifier[],
@@ -250,7 +247,7 @@ export const Kanban = ({
         },
         [activeId, items],
     )
-    const [clonedItems, setClonedItems] = useState<Items | null>(null)
+    const [clonedItems, setClonedItems] = useState<IKanbanItems | null>(null)
     const sensors = useSensors(
         useSensor(MouseSensor),
         useSensor(TouchSensor),
@@ -284,6 +281,7 @@ export const Kanban = ({
             // Reset items to their original state in case items have been
             // Dragged across containers
             setItems(clonedItems)
+            onSetTasks(clonedItems)
         }
 
         setActiveId(null)
@@ -372,6 +370,8 @@ export const Kanban = ({
                 ...items,
                 [newContainerId]: [],
             }))
+
+            onSetTasks(items)
         })
     }
 
@@ -403,6 +403,7 @@ export const Kanban = ({
                 }
 
                 if (activeContainer !== overContainer) {
+                    onSetTasks(items)
                     setItems(items => {
                         const activeItems = items[activeContainer]
                         const overItems = items[overContainer]
@@ -490,6 +491,7 @@ export const Kanban = ({
                             ),
                             [newContainerId]: [active.id],
                         }))
+                        onSetTasks(items)
                         setActiveId(null)
                     })
                     return
@@ -510,6 +512,17 @@ export const Kanban = ({
                                 overIndex,
                             ),
                         }))
+
+                        console.log('overContainer', {
+                            ...items,
+                            [overContainer]: arrayMove(
+                                items[overContainer],
+                                activeIndex,
+                                overIndex,
+                            ),
+                        })
+
+                        onSetTasks(items)
                     }
                 }
 

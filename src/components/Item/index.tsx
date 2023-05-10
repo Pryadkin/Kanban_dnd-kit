@@ -3,15 +3,15 @@
 /* eslint-disable react/prop-types */
 import React, {useEffect} from 'react'
 
+import {Handle} from '@components/Handle'
+import {Remove} from '@components/Remove'
 import type {DraggableSyntheticListeners} from '@dnd-kit/core'
 import type {Transform} from '@dnd-kit/utilities'
 import classNames from 'classnames'
 
-import {ITask} from '../../types'
-import {Handle} from '../Handle'
-import {Remove} from '../Remove'
-
 import styles from './Item.module.scss'
+
+import {ITask} from '@/types'
 
 export interface Props {
     dragOverlay?: boolean;

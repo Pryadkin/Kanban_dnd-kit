@@ -1,3 +1,7 @@
+import {UniqueIdentifier} from '@dnd-kit/core'
+
+export type IKanbanItems = Record<UniqueIdentifier, UniqueIdentifier[]>
+
 export interface ITask {
     id: string,
     title: string,
@@ -7,11 +11,11 @@ export interface ITask {
 export interface ICol {
     id: string,
     title: string,
-    tasks: string[],
+    tasks: UniqueIdentifier[],
 }
 
 export type TTasks = {
-    [id: string]: string[]
+    [id: UniqueIdentifier]: UniqueIdentifier[]
 }
 
 export type TColName = {

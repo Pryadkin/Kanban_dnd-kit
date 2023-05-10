@@ -1,8 +1,7 @@
+import {Container, ContainerProps} from '@components/Container'
 import {UniqueIdentifier} from '@dnd-kit/core'
 import {AnimateLayoutChanges, defaultAnimateLayoutChanges, useSortable} from '@dnd-kit/sortable'
 import {CSS} from '@dnd-kit/utilities'
-
-import {Container, ContainerProps} from '../Container'
 
 const animateLayoutChanges: AnimateLayoutChanges = args => defaultAnimateLayoutChanges({...args, wasDragging: true})
 
