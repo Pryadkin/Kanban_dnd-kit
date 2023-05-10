@@ -1,6 +1,7 @@
 export interface ITask {
     id: string,
     title: string,
+    assigned: string,
 }
 
 export interface ICol {

@@ -36,7 +36,7 @@ import {
     horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
 
-import {TColName} from '../../types'
+import {ITask, TColName} from '../../types'
 import {createRange} from '../../utils/createRange'
 import {getColor} from '../../utils/getColor'
 import {coordinateGetter as multipleContainersCoordinateGetter} from '../../utils/multipulContainersKayboardCooldinates'
@@ -58,6 +58,7 @@ const dropAnimation: DropAnimation = {
 type Items = Record<UniqueIdentifier, UniqueIdentifier[]>
 
 interface Props {
+    tasks: ITask[];
     columnNames: TColName;
     adjustScale?: boolean;
     cancelDrop?: CancelDrop;
@@ -84,6 +85,7 @@ interface Props {
     trashable?: boolean;
     scrollable?: boolean;
     vertical?: boolean;
+    onSetTasks: (val: Items) => void
 }
 
 export const TRASH_ID = 'void'
@@ -117,7 +119,16 @@ const Trash = ({id}: {id: UniqueIdentifier}) => {
     )
 }
 
+interface IObjTask {
+    [id: string]: {
+        id: string,
+        title: string,
+        assigned: string,
+    }
+}
+
 export const Kanban = ({
+    tasks,
     columnNames,
     adjustScale = false,
     itemCount = 3,
@@ -136,7 +147,22 @@ export const Kanban = ({
     trashable = false,
     vertical = false,
     scrollable,
+    onSetTasks,
 }: Props) => {
+    const taskToObjTask = (taskElems: ITask[]) => {
+        const objTask: IObjTask = {}
+
+        taskElems.forEach(taskElem => {
+            objTask[taskElem.id] = {
+                id: taskElem.id,
+                title: taskElem.title,
+                assigned: taskElem.assigned,
+            }
+        })
+
+        return objTask
+    }
+
     const [items, setItems] = useState<Items>(
         () => initialItems ?? {
             A: createRange(itemCount, index => `A${index + 1}`),
@@ -145,6 +171,10 @@ export const Kanban = ({
             D: createRange(itemCount, index => `D${index + 1}`),
         },
     )
+    useEffect(() => {
+        onSetTasks(items)
+    }, [items, onSetTasks])
+
     const [containers, setContainers] = useState(
         Object.keys(items) as UniqueIdentifier[],
     )
@@ -269,7 +299,7 @@ export const Kanban = ({
     function renderSortableItemDragOverlay(id: UniqueIdentifier) {
         return (
             <Item
-                value={id}
+                value={taskToObjTask(tasks)[id]}
                 handle={handle}
                 style={getItemStyles({
                     containerId: findContainer(id) as UniqueIdentifier,
@@ -302,7 +332,7 @@ export const Kanban = ({
                 {items[containerId].map((item, index) => (
                     <Item
                         key={item}
-                        value={item}
+                        value={taskToObjTask(tasks)[item]}
                         handle={handle}
                         style={getItemStyles({
                             containerId,
@@ -522,7 +552,8 @@ export const Kanban = ({
                                     <SortableItem
                                         disabled={isSortingContainer}
                                         key={value}
-                                        id={value}
+                                        value={taskToObjTask(tasks)}
+                                        id={taskToObjTask(tasks)[value].id}
                                         index={index}
                                         handle={handle}
                                         style={getItemStyles}
@@ -551,7 +582,10 @@ export const Kanban = ({
                 </SortableContext>
             </div>
             {createPortal(
-                <DragOverlay adjustScale={adjustScale} dropAnimation={dropAnimation}>
+                <DragOverlay
+                    adjustScale={adjustScale}
+                    dropAnimation={dropAnimation}
+                >
                     {activeId
                         ? containers.includes(activeId)
                             ? renderContainerDragOverlay(activeId)

@@ -3,10 +3,12 @@ import {useEffect, useState} from 'react'
 import {UniqueIdentifier} from '@dnd-kit/core'
 import {useSortable} from '@dnd-kit/sortable'
 
+import {ITask} from '../../types'
 import {getColor} from '../../utils/getColor'
 import {Item} from '../Item'
 
 interface SortableItemProps {
+    value: any,
     containerId: UniqueIdentifier;
     id: UniqueIdentifier;
     index: number;
@@ -20,6 +22,7 @@ interface SortableItemProps {
 
 export const SortableItem = ({
     disabled,
+    value,
     id,
     index,
     handle,
@@ -60,7 +63,7 @@ export const SortableItem = ({
     return (
         <Item
             ref={disabled ? undefined : setNodeRef}
-            value={id}
+            value={value[id]}
             dragging={isDragging}
             sorting={isSorting}
             handle={handle}
