@@ -5,6 +5,7 @@ export type IKanbanItems = Record<UniqueIdentifier, UniqueIdentifier[]>
 export interface ITask {
     id: string,
     title: string,
+    description: string,
     assigned: string,
 }
 

@@ -1,53 +1,75 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 
-import {
-    ICol, IKanbanItems, TColName, TTasks,
-} from '../../types'
-import {Kanban} from '../Kanban'
+import {Kanban} from '@components/Kanban'
 
 import {updateColumns} from '@/redux'
 import {RootState} from '@/redux/store'
+import {
+    ICol, IKanbanItems, TColName, TTasks,
+} from '@/types'
 
 export const KanbanWrapper = () => {
     const dispatch = useDispatch()
     const tasks = useSelector((state: RootState) => state.kanban.tasks)
     const columns = useSelector((state: RootState) => state.kanban.columns)
-
-    const taskItems: TTasks = {}
-    const columnItems: TColName = {}
+    const [taskItems, setTaskItems] = useState<TTasks>()
+    const [colNames, setColNames] = useState<TColName>()
 
     const getTaskItems = (elems: ICol[]) => {
+        const items: TTasks = {}
+
         elems.forEach(elem => {
-            taskItems[elem.id] = elem.tasks
+            items[elem.id] = elem.tasks
         })
 
-        return taskItems
+        setTaskItems(items)
     }
 
     const getColumnNames = (elems: ICol[]) => {
+        const items: TColName = {}
+
         elems.forEach(elem => {
-            columnItems[elem.id] = elem.title
+            items[elem.id] = elem.title
         })
-        return columnItems
+
+        setColNames(items)
     }
 
     const handleSetTasks = (elems: IKanbanItems) => {
-        const newCols = Object.entries(elems)
-            .map(([colId, array]) => ({
-                id: colId,
-                title: getColumnNames(columns)[colId],
-                tasks: array,
-            }))
-        dispatch(updateColumns(newCols))
+        if (colNames) {
+            const newCols = Object.entries(elems)
+                .map(([colId, array]) => ({
+                    id: colId,
+                    title: colNames[colId],
+                    tasks: array,
+                }))
+            dispatch(updateColumns(newCols))
+        }
     }
 
+    useEffect(() => {
+        getColumnNames(columns)
+        getTaskItems(columns)
+    }, [])
+
+    useEffect(() => {
+        getTaskItems(columns)
+    }, [tasks, columns])
+
     return (
-        <Kanban
-            items={getTaskItems(columns)}
-            columnNames={getColumnNames(columns)}
-            tasks={tasks}
-            onSetTasks={handleSetTasks}
-            handle
-        />
+        <div>
+            {taskItems && colNames && (
+                <Kanban
+                    items={taskItems}
+                    columnNames={colNames}
+                    tasks={tasks}
+                    onSetTasks={handleSetTasks}
+                    handle
+                />
+
+            )}
+        </div>
     )
 }

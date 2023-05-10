@@ -1,1 +1,1 @@
-export {addTasks, updateColumns} from './kanban'
+export {addTask, updateColumns} from './kanban'
