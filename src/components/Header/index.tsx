@@ -6,7 +6,7 @@ export const Header = () => {
     console.log('svg')
     return (
         <div className={styles.wrapper}>
-            <Logo />
+            <Logo className={styles.logo} />
         </div>
     )
 }
