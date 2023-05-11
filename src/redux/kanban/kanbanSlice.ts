@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import {Dispatch, createSlice} from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit'
 import type {PayloadAction} from '@reduxjs/toolkit'
 
 import {ICol, ITask} from '../../types'
@@ -16,9 +16,12 @@ export const kanbanSlice = createSlice({
         addTask: (state, action: PayloadAction<ITask>) => {
             state.tasks.push(action.payload)
         },
+        updateTasks: (state, action: PayloadAction<ITask[]>) => {
+            state.tasks = action.payload
+        },
     },
 })
 
-export const {addTask, updateColumns} = kanbanSlice.actions
+export const {addTask, updateTasks, updateColumns} = kanbanSlice.actions
 
 export default kanbanSlice.reducer

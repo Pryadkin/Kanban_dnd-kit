@@ -1,3 +1,26 @@
 .wrapper {
     padding: 20px;
 }
+
+.elementWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.textAreaWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.elementEditWrapper {
+    display: flex;
+}
+
+.input {
+    height: 30px;
+    width: 500px;
+}
+
+.btn {
+    margin-left: 20px;
+}
