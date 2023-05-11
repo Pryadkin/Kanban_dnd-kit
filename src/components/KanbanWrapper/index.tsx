@@ -2,8 +2,7 @@
 import {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 
-import {Kanban} from '@components/Kanban'
-
+import {KanbanElement} from '@/components/KanbanElement'
 import {updateColumns} from '@/redux'
 import {RootState} from '@/redux/store'
 import {
@@ -61,14 +60,13 @@ export const KanbanWrapper = () => {
     return (
         <div>
             {taskItems && colNames && (
-                <Kanban
+                <KanbanElement
                     items={taskItems}
                     columnNames={colNames}
                     tasks={tasks}
                     onSetTasks={handleSetTasks}
                     handle
                 />
-
             )}
         </div>
     )

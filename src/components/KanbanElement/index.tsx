@@ -125,7 +125,7 @@ interface IObjTask {
     }
 }
 
-export const Kanban = ({
+export const KanbanElement = ({
     tasks,
     columnNames,
     adjustScale = false,
