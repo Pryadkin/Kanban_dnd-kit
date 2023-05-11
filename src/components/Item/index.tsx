@@ -3,6 +3,7 @@
 /* eslint-disable react/no-unused-prop-types */
 /* eslint-disable react/prop-types */
 import React, {useEffect, useState} from 'react'
+import {Link} from 'react-router-dom'
 
 import {Handle} from '@components/Handle'
 import {Remove} from '@components/Remove'
@@ -81,10 +82,6 @@ export const Item = React.memo(
 
             const handleContentMouseLeave = () => {
                 setContentActive(false)
-            }
-
-            const handleContentBtnClick = () => {
-                console.log('first')
             }
 
             useEffect(() => {
@@ -175,16 +172,25 @@ export const Item = React.memo(
                                 >
                                     {value.assigned}
                                 </div>
-                                <button
+                                <Link
+                                    to={`tasks/${value.id}`}
+                                    className={classNames(
+                                        styles.contentBtn,
+                                        contentActive && styles.show,
+                                    )}
+                                >
+                                    Подробнее
+                                </Link>
+                                {/* <Link
+                                    to={''}
                                     className={classNames(
                                         styles.contentBtn,
                                         contentActive && styles.show,
                                     )}
                                     onClick={handleContentBtnClick}
-                                    type="button"
                                 >
                                     Подробнее
-                                </button>
+                                </Link> */}
                             </div>
                             <span className={styles.Actions}>
                                 {onRemove
