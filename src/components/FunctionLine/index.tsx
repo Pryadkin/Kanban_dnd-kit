@@ -6,13 +6,16 @@ import {
 
 import {AddTaskModal} from '../AddTaskModal'
 
+import styles from './FunctionLine.module.scss'
+
 export const FunctionLine = () => {
     const [isModalOpen, setIsAddTaskModalOpen] = useState(false)
 
     return (
-        <div>
+        <div className={styles.wrapper}>
             <Button
                 onClick={() => setIsAddTaskModalOpen(true)}
+                size="small"
             >
                 add task
             </Button>

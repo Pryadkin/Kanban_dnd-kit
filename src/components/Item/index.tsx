@@ -1,7 +1,8 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable consistent-return */
 /* eslint-disable react/no-unused-prop-types */
 /* eslint-disable react/prop-types */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 
 import {Handle} from '@components/Handle'
 import {Remove} from '@components/Remove'
@@ -72,6 +73,20 @@ export const Item = React.memo(
             },
             ref,
         ) => {
+            const [contentActive, setContentActive] = useState(false)
+
+            const handleContentMouseOver = () => {
+                setContentActive(true)
+            }
+
+            const handleContentMouseLeave = () => {
+                setContentActive(false)
+            }
+
+            const handleContentBtnClick = () => {
+                console.log('first')
+            }
+
             useEffect(() => {
                 if (!dragOverlay) {
                     return
@@ -108,6 +123,8 @@ export const Item = React.memo(
                             sorting && styles.sorting,
                             dragOverlay && styles.dragOverlay,
                         )}
+                        onMouseOver={handleContentMouseOver}
+                        onMouseLeave={handleContentMouseLeave}
                         style={
                             {
                                 ...wrapperStyle,
@@ -147,7 +164,28 @@ export const Item = React.memo(
                             {...props}
                             tabIndex={!handle ? 0 : undefined}
                         >
-                            <div>{value.title}</div>
+                            <div className={styles.contant}>
+                                <div
+                                    className={styles.title}
+                                >
+                                    {value.title}
+                                </div>
+                                <div
+                                    className={styles.assigned}
+                                >
+                                    {value.assigned}
+                                </div>
+                                <button
+                                    className={classNames(
+                                        styles.contentBtn,
+                                        contentActive && styles.show,
+                                    )}
+                                    onClick={handleContentBtnClick}
+                                    type="button"
+                                >
+                                    Подробнее
+                                </button>
+                            </div>
                             <span className={styles.Actions}>
                                 {onRemove
                                     ? (
