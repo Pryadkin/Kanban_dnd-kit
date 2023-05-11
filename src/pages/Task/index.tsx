@@ -8,14 +8,15 @@ import TextArea from 'antd/es/input/TextArea'
 import styles from './Task.module.scss'
 
 import {EditBar} from '@/components/EditBar'
-import {updateTasks} from '@/redux'
+import {updateColumns, updateTasks} from '@/redux'
 import {RootState} from '@/redux/store'
 
-export const Task = () => {
+const Task = () => {
     const dispatch = useDispatch()
     const nav = useNavigate()
     const {taskId} = useParams()
     const tasks = useSelector((state: RootState) => state.kanban.tasks)
+    const columns = useSelector((state: RootState) => state.kanban.columns)
     const currentTask = tasks.find(task => task.id === taskId)
     const [isEdit, setIsEdit] = useState(false)
     const [titleInput, setTitleInput] = useState(currentTask?.title || '')
@@ -82,10 +83,21 @@ export const Task = () => {
 
     const handleDeleteButtonClick = () => {
         const newTasks = tasks.filter(task => task.id !== taskId)
-        nav('/kanban')
-        setTimeout(() => {
-            dispatch(updateTasks(newTasks))
+        const newColumns = columns.map(column => {
+            if (taskId && column.tasks.includes(taskId)) {
+                const updateTaskList = column.tasks.filter(id => id !== taskId)
+
+                return {
+                    ...column,
+                    tasks: updateTaskList,
+                }
+            }
+            return column
         })
+
+        dispatch(updateTasks(newTasks))
+        dispatch(updateColumns(newColumns))
+        nav('/kanban')
     }
 
     return (
@@ -163,3 +175,5 @@ export const Task = () => {
         </div>
     )
 }
+
+export default Task

@@ -1,11 +1,11 @@
 /* eslint-disable import/no-cycle */
-import {FC} from 'react'
+import {FC, lazy} from 'react'
 import {Route, Routes} from 'react-router-dom'
 
 import {Layout} from '@components/Layout'
 
-import {Task} from './pages'
-import {Kanban} from './pages/Kanban'
+const Kanban = lazy(() => import('./pages/Kanban'))
+const Task = lazy(() => import('./pages/Task'))
 
 export const App: FC = () => (
     <Routes>
@@ -14,7 +14,10 @@ export const App: FC = () => (
                 path="/kanban"
                 element={<Kanban />}
             />
-            <Route path="/tasks/:taskId" element={<Task />} />
+            <Route
+                path="/tasks/:taskId"
+                element={<Task />}
+            />
         </Route>
     </Routes>
 )

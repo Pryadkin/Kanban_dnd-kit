@@ -1,9 +1,11 @@
 import {FunctionLine} from '@/components/FunctionLine'
 import {KanbanWrapper} from '@/components/KanbanWrapper'
 
-export const Kanban = () => (
+const Kanban = () => (
     <>
         <FunctionLine />
         <KanbanWrapper />
     </>
 )
+
+export default Kanban
