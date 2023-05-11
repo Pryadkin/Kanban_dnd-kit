@@ -5,7 +5,7 @@ import {Route, Routes} from 'react-router-dom'
 import {Layout} from '@components/Layout'
 
 import {Task} from './pages'
-import {Kanban} from './pages/KanbanPage'
+import {Kanban} from './pages/Kanban'
 
 export const App: FC = () => (
     <Routes>
