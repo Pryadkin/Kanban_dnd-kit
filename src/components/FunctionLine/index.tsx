@@ -4,12 +4,14 @@ import {
     Button,
 } from 'antd'
 
+import {AddColumnModal} from '../AddColumnModal'
 import {AddTaskModal} from '../AddTaskModal'
 
 import styles from './FunctionLine.module.scss'
 
 export const FunctionLine = () => {
-    const [isModalOpen, setIsAddTaskModalOpen] = useState(false)
+    const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false)
+    const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false)
 
     return (
         <div className={styles.wrapper}>
@@ -19,9 +21,19 @@ export const FunctionLine = () => {
             >
                 add task
             </Button>
+            <Button
+                onClick={() => setIsAddColumnModalOpen(true)}
+                size="small"
+            >
+                add column
+            </Button>
             <AddTaskModal
-                isModalOpen={isModalOpen}
+                isModalOpen={isAddTaskModalOpen}
                 onModalOpen={val => setIsAddTaskModalOpen(val)}
+            />
+            <AddColumnModal
+                isModalOpen={isAddColumnModalOpen}
+                onModalOpen={val => setIsAddColumnModalOpen(val)}
             />
         </div>
     )

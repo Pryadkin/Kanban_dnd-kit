@@ -54,6 +54,7 @@ export const KanbanWrapper = () => {
     }, [])
 
     useEffect(() => {
+        getColumnNames(columns)
         getTaskItems(columns)
     }, [tasks, columns])
 

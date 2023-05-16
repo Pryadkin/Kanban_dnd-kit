@@ -171,10 +171,6 @@ export const KanbanElement = ({
         },
     )
 
-    useEffect(() => {
-        initialItems && setItems(initialItems)
-    }, [initialItems])
-
     const [containers, setContainers] = useState(
         Object.keys(items) as UniqueIdentifier[],
     )
@@ -182,6 +178,11 @@ export const KanbanElement = ({
     const lastOverId = useRef<UniqueIdentifier | null>(null)
     const recentlyMovedToNewContainer = useRef(false)
     const isSortingContainer = activeId ? containers.includes(activeId) : false
+
+    useEffect(() => {
+        setContainers(Object.keys(columnNames) as UniqueIdentifier[])
+        initialItems && setItems(initialItems)
+    }, [columnNames, initialItems])
 
     /**
      * Custom collision detection strategy optimized for multiple containers
