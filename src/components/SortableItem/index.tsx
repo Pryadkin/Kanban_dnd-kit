@@ -4,6 +4,7 @@ import {Item} from '@components/Item'
 import {UniqueIdentifier} from '@dnd-kit/core'
 import {useSortable} from '@dnd-kit/sortable'
 
+import {TStatusColor} from '@/types'
 import {getColor} from '@/utils'
 
 interface SortableItemProps {
@@ -13,6 +14,7 @@ interface SortableItemProps {
     index: number;
     handle: boolean;
     disabled?: boolean;
+    statusColor: TStatusColor
     style(args: any): React.CSSProperties;
     getIndex(id: UniqueIdentifier): number;
     renderItem(): React.ReactElement;
@@ -30,6 +32,7 @@ export const SortableItem = ({
     containerId,
     getIndex,
     wrapperStyle,
+    statusColor,
 }: SortableItemProps) => {
     const {
         setNodeRef,
@@ -78,6 +81,7 @@ export const SortableItem = ({
                 containerId,
             })}
             color={getColor(id)}
+            statusColor={statusColor}
             transition={transition}
             transform={transform}
             fadeIn={mountedWhileDragging}

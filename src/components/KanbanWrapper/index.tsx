@@ -1,3 +1,4 @@
+/* eslint-disable for-direction */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
@@ -6,7 +7,7 @@ import {KanbanElement} from '@/components/KanbanElement'
 import {updateColumns} from '@/redux'
 import {RootState} from '@/redux/store'
 import {
-    ICol, IKanbanItems, TColName, TTasks,
+    ICol, IKanbanItems, IObjTask, ITask, TColName, TTasks,
 } from '@/types'
 
 export const KanbanWrapper = () => {
@@ -14,7 +15,8 @@ export const KanbanWrapper = () => {
     const tasks = useSelector((state: RootState) => state.kanban.tasks)
     const columns = useSelector((state: RootState) => state.kanban.columns)
     const [taskItems, setTaskItems] = useState<TTasks>()
-    const [colNames, setColNames] = useState<TColName>()
+    const [objColNames, setObjColNames] = useState<TColName>()
+    const [objTask, setObjTask] = useState<IObjTask>()
 
     const getTaskItems = (elems: ICol[]) => {
         const items: TTasks = {}
@@ -33,39 +35,69 @@ export const KanbanWrapper = () => {
             items[elem.id] = elem.title
         })
 
-        setColNames(items)
+        setObjColNames(items)
     }
 
     const handleSetTasks = (elems: IKanbanItems) => {
-        if (colNames) {
+        if (objColNames) {
             const newCols = Object.entries(elems)
-                .map(([colId, array]) => ({
+                .map(([colId, taskArray]) => ({
                     id: colId,
-                    title: colNames[colId],
-                    tasks: array,
+                    title: objColNames[colId],
+                    tasks: taskArray,
                 }))
             dispatch(updateColumns(newCols))
         }
     }
 
-    useEffect(() => {
-        getColumnNames(columns)
-        getTaskItems(columns)
-    }, [])
+    const handleSetColumns = (colIds: string[]) => {
+        const newCols = colIds.map(colId => {
+            let newCol: any = null
+            columns.forEach(column => {
+                if (column.id === colId) {
+                    newCol = column
+                }
+            })
+            return newCol
+        })
+
+        dispatch(updateColumns(newCols))
+    }
+
+    const taskToObjTask = (taskElems: ITask[]) => {
+        const task: IObjTask = {}
+
+        taskElems.forEach(taskElem => {
+            task[taskElem.id] = {
+                id: taskElem.id,
+                title: taskElem.title,
+                description: taskElem.description,
+                assigned: taskElem.assigned,
+                priority: taskElem.priority,
+            }
+        })
+
+        setObjTask(task)
+    }
 
     useEffect(() => {
         getColumnNames(columns)
         getTaskItems(columns)
     }, [tasks, columns])
 
+    useEffect(() => {
+        taskToObjTask(tasks)
+    }, [tasks])
+
     return (
         <div>
-            {taskItems && colNames && (
+            {taskItems && objColNames && objTask && (
                 <KanbanElement
                     items={taskItems}
-                    columnNames={colNames}
-                    tasks={tasks}
+                    objColNames={objColNames}
+                    objTask={objTask}
                     onSetTasks={handleSetTasks}
+                    onSetColumn={handleSetColumns}
                     handle
                 />
             )}

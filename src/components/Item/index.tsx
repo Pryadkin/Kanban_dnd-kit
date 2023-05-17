@@ -9,11 +9,11 @@ import {Handle} from '@components/Handle'
 import {Remove} from '@components/Remove'
 import type {DraggableSyntheticListeners} from '@dnd-kit/core'
 import type {Transform} from '@dnd-kit/utilities'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import styles from './Item.module.scss'
 
-import {ITask} from '@/types'
+import {ITask, TStatusColor} from '@/types'
 
 export interface Props {
     dragOverlay?: boolean;
@@ -32,6 +32,7 @@ export interface Props {
     transition?: string | null;
     wrapperStyle?: React.CSSProperties;
     value: ITask;
+    statusColor: TStatusColor;
     onRemove?(): void;
     renderItem?(args: {
         dragOverlay: boolean;
@@ -69,6 +70,7 @@ export const Item = React.memo(
                 transition,
                 transform,
                 value,
+                statusColor,
                 wrapperStyle,
                 ...props
             },
@@ -119,7 +121,7 @@ export const Item = React.memo(
                 )
                 : (
                     <li
-                        className={classNames(
+                        className={cn(
                             styles.Wrapper,
                             fadeIn && styles.fadeIn,
                             sorting && styles.sorting,
@@ -152,8 +154,9 @@ export const Item = React.memo(
                         ref={ref}
                     >
                         <div
-                            className={classNames(
+                            className={cn(
                                 styles.Item,
+                                styles[statusColor],
                                 dragging && styles.dragging,
                                 handle && styles.withHandle,
                                 dragOverlay && styles.dragOverlay,
@@ -178,7 +181,7 @@ export const Item = React.memo(
                                     {value.assigned}
                                 </div>
                                 <button
-                                    className={classNames(
+                                    className={cn(
                                         styles.contentBtn,
                                         contentActive && styles.show,
                                     )}

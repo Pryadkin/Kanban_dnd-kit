@@ -41,7 +41,9 @@ import {DroppableContainer} from '../DroppableContainer'
 import {Item} from '../Item'
 import {SortableItem} from '../SortableItem'
 
-import {IKanbanItems, ITask, TColName} from '@/types'
+import {
+    IKanbanItems, IObjTask, TColName,
+} from '@/types'
 import {createRange, getColor, coordinateGetter as multipleContainersCoordinateGetter} from '@/utils'
 
 const dropAnimation: DropAnimation = {
@@ -55,8 +57,8 @@ const dropAnimation: DropAnimation = {
 }
 
 interface Props {
-    tasks: ITask[];
-    columnNames: TColName;
+    objTask: IObjTask
+    objColNames: TColName;
     adjustScale?: boolean;
     cancelDrop?: CancelDrop;
     columns?: number;
@@ -83,6 +85,7 @@ interface Props {
     scrollable?: boolean;
     vertical?: boolean;
     onSetTasks: (val: IKanbanItems) => void
+    onSetColumn: (val: any) => void
 }
 
 export const TRASH_ID = 'void'
@@ -116,18 +119,9 @@ const Trash = ({id}: {id: UniqueIdentifier}) => {
     )
 }
 
-interface IObjTask {
-    [id: string]: {
-        id: string,
-        title: string,
-        description: string,
-        assigned: string,
-    }
-}
-
 export const KanbanElement = ({
-    tasks,
-    columnNames,
+    objTask,
+    objColNames,
     adjustScale = false,
     itemCount = 3,
     cancelDrop,
@@ -146,28 +140,11 @@ export const KanbanElement = ({
     vertical = false,
     scrollable,
     onSetTasks,
+    onSetColumn,
 }: Props) => {
-    const taskToObjTask = (taskElems: ITask[]) => {
-        const objTask: IObjTask = {}
-
-        taskElems.forEach(taskElem => {
-            objTask[taskElem.id] = {
-                id: taskElem.id,
-                title: taskElem.title,
-                description: taskElem.description,
-                assigned: taskElem.assigned,
-            }
-        })
-
-        return objTask
-    }
-
     const [items, setItems] = useState<IKanbanItems>(
         () => initialItems ?? {
             A: createRange(itemCount, index => `A${index + 1}`),
-            B: createRange(itemCount, index => `B${index + 1}`),
-            C: createRange(itemCount, index => `C${index + 1}`),
-            D: createRange(itemCount, index => `D${index + 1}`),
         },
     )
 
@@ -180,9 +157,9 @@ export const KanbanElement = ({
     const isSortingContainer = activeId ? containers.includes(activeId) : false
 
     useEffect(() => {
-        setContainers(Object.keys(columnNames) as UniqueIdentifier[])
+        setContainers(Object.keys(objColNames) as UniqueIdentifier[])
         initialItems && setItems(initialItems)
-    }, [columnNames, initialItems])
+    }, [objColNames, initialItems])
 
     /**
      * Custom collision detection strategy optimized for multiple containers
@@ -300,7 +277,7 @@ export const KanbanElement = ({
     function renderSortableItemDragOverlay(id: UniqueIdentifier) {
         return (
             <Item
-                value={taskToObjTask(tasks)[id]}
+                value={objTask[id]}
                 handle={handle}
                 style={getItemStyles({
                     containerId: findContainer(id) as UniqueIdentifier,
@@ -312,6 +289,7 @@ export const KanbanElement = ({
                     isDragOverlay: true,
                 })}
                 color={getColor(id)}
+                statusColor={objTask[id].priority}
                 wrapperStyle={wrapperStyle({index: 0})}
                 renderItem={renderItem}
                 dragOverlay
@@ -322,7 +300,7 @@ export const KanbanElement = ({
     function renderContainerDragOverlay(containerId: UniqueIdentifier) {
         return (
             <Container
-                label={columnNames[containerId]}
+                label={objColNames[containerId]}
                 columns={columns}
                 style={{
                     height: '100%',
@@ -333,7 +311,7 @@ export const KanbanElement = ({
                 {items[containerId].map((item, index) => (
                     <Item
                         key={item}
-                        value={taskToObjTask(tasks)[item]}
+                        value={objTask[item]}
                         handle={handle}
                         style={getItemStyles({
                             containerId,
@@ -345,6 +323,7 @@ export const KanbanElement = ({
                             isDragOverlay: false,
                         })}
                         color={getColor(item)}
+                        statusColor={objTask[item].priority}
                         wrapperStyle={wrapperStyle({index})}
                         renderItem={renderItem}
                     />
@@ -445,6 +424,7 @@ export const KanbanElement = ({
                 }
             }}
             onDragEnd={({active, over}) => {
+                let isSetContainers = false
                 if (active.id in items && over?.id) {
                     setContainers(containers => {
                         const activeIndex = containers.indexOf(active.id)
@@ -452,6 +432,12 @@ export const KanbanElement = ({
 
                         return arrayMove(containers, activeIndex, overIndex)
                     })
+
+                    const activeIndex = containers.indexOf(active.id)
+                    const overIndex = containers.indexOf(over.id)
+
+                    isSetContainers = true
+                    onSetColumn(arrayMove(containers, activeIndex, overIndex))
                 }
 
                 const activeContainer = findContainer(active.id)
@@ -520,15 +506,17 @@ export const KanbanElement = ({
                                 overIndex,
                             ),
                         }))
-                        onSetTasks({
-                            ...items,
-                            [overContainer]: arrayMove(
-                                items[overContainer],
-                                activeIndex,
-                                overIndex,
-                            ),
-                        })
-                    } else {
+                        if (!isSetContainers) {
+                            onSetTasks({
+                                ...items,
+                                [overContainer]: arrayMove(
+                                    items[overContainer],
+                                    activeIndex,
+                                    overIndex,
+                                ),
+                            })
+                        }
+                    } else if (!isSetContainers) {
                         onSetTasks(items)
                     }
                 }
@@ -559,7 +547,7 @@ export const KanbanElement = ({
                         <DroppableContainer
                             key={containerId}
                             id={containerId}
-                            label={minimal ? undefined : columnNames[containerId]}
+                            label={minimal ? undefined : objColNames[containerId]}
                             columns={columns}
                             items={items[containerId]}
                             scrollable={scrollable}
@@ -567,13 +555,16 @@ export const KanbanElement = ({
                             unstyled={minimal}
                             onRemove={() => handleRemove(containerId)}
                         >
-                            <SortableContext items={items[containerId]} strategy={strategy}>
+                            <SortableContext
+                                items={items[containerId]}
+                                strategy={strategy}
+                            >
                                 {items[containerId].map((value, index) => (
                                     <SortableItem
                                         disabled={isSortingContainer}
                                         key={value}
-                                        value={taskToObjTask(tasks)}
-                                        id={taskToObjTask(tasks)[value].id}
+                                        value={objTask}
+                                        id={objTask[value].id}
                                         index={index}
                                         handle={handle}
                                         style={getItemStyles}
@@ -581,6 +572,7 @@ export const KanbanElement = ({
                                         renderItem={renderItem}
                                         containerId={containerId}
                                         getIndex={getIndex}
+                                        statusColor={objTask[value].priority}
                                     />
                                 ))}
                             </SortableContext>

@@ -121,7 +121,18 @@
   display: block;
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
-  background-color: var(--color);
+}
+
+.high:before {
+  background-color: red;
+}
+
+.medium:before {
+  background-color: lightgreen;
+}
+
+.low:before {
+  background-color: blue;
 }
 
 .Item:hover .Remove {
