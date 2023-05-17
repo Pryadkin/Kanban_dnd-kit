@@ -333,7 +333,10 @@ export const KanbanElement = ({
     }
 
     function handleRemove(containerID: UniqueIdentifier) {
-        setContainers(containers => containers.filter(id => id !== containerID))
+        const updateContainers = containers.filter(id => id !== containerID)
+
+        setContainers(updateContainers)
+        onSetColumn(updateContainers)
     }
 
     function getNextContainerId() {
